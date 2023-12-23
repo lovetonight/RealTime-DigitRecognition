@@ -2,10 +2,14 @@ import cv2
 import numpy as np        
 import matplotlib.pyplot as plt
 from scipy import ndimage
+import tensorflow.keras
 import math
 from keras.models import load_model
 from cnn_model.one_layer_nn import *
 from cnn_model.softmax import SoftmaxRegression
+
+# from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from KNN import KNN
 import torch
 
 
@@ -30,6 +34,7 @@ def predict(img):
 
 def predict_2(img):
     img = np.array(img).reshape(-1, 28 * 28)
+    print("shape=", img.shape)
     y_pred = one_layer_nn_2.forward(img)
     max_index = np.argmax(y_pred)
     return max_index
@@ -37,6 +42,13 @@ def predict_3(img):
     img = np.array(img).reshape(28 * 28)
     predictions = softmax.softmaxPredict(img)
     return predictions[0][0]
+
+def knn(img):
+    test_image = img.reshape(-1,28,28,1)
+    (data_train, target_train), (data_test, target_test) = tensorflow.keras.datasets.mnist.load_data()
+    Knn = KNN(11)
+    Knn.fit(data_test, target_test)
+    return Knn.predict(test_image[:])
     
 
 #pitting label
@@ -101,13 +113,21 @@ def get_output_image(path, index = 1):
             th,fnl = cv2.threshold(roi,127,255,cv2.THRESH_BINARY)
 
             # getting prediction of cropped image
-            match index:
-                case 1: 
-                    pred = predict_digit(roi)
-                case 2:
-                    pred = predict(roi)
-                case 3:
-                    pred = predict_2(roi)                            
+            # match index:
+            #     case 1:
+            #         pred = predict_digit(roi)
+            #     case 2:
+            #         pred = predict(roi)
+            #     case 3:
+            #         pred = predict_2(roi)
+            if index == 1:
+                pred = predict_digit(roi)
+            elif index == 2:
+                pred = predict(roi)
+            elif index == 3:
+                pred = predict_2(roi)
+            elif index == 4:
+                pred = knn(roi)
             print(pred)
             
             # placing label on each digit
