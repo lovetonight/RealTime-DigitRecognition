@@ -2,12 +2,14 @@ import cv2
 import numpy as np        
 import matplotlib.pyplot as plt
 from scipy import ndimage
+import pandas as pd
 import tensorflow.keras
 import math
 from keras.models import load_model
 from cnn_model.one_layer_nn import *
 from cnn_model.softmax import SoftmaxRegression
-
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
 # from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from KNN import KNN
 import torch
@@ -44,11 +46,26 @@ def predict_3(img):
     return predictions[0][0]
 
 def knn(img):
-    test_image = img.reshape(-1,28,28,1)
+    print(img.shape)
+    # print(img)
+    # test_image = img.reshape(-1,28,28,1)
     (data_train, target_train), (data_test, target_test) = tensorflow.keras.datasets.mnist.load_data()
-    Knn = KNN(11)
-    Knn.fit(data_test, target_test)
-    return Knn.predict(test_image[:])
+    Knn = KNN(7)
+    Knn.fit(data_train, target_train)
+    return Knn._predict(img)
+
+# def knn(img):
+#     # read data
+#     train_df = pd.read_csv("train.csv")
+#     y=train_df['label']
+#     x=train_df.drop('label',axis=1)
+#
+#     # (data_train, target_train), (data_test, target_test) = tensorflow.keras.datasets.mnist.load_data()
+#     classifier = KNeighborsClassifier(n_neighbors=7)
+#     classifier.fit(x, y)
+#     return classifier.predict(np.array(img).reshape(-1, 28 * 28))
+
+
     
 
 #pitting label
